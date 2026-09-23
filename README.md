@@ -76,5 +76,5 @@ The following libraries and tools were utilized across the projects:
 To access the code and notebooks, clone the repository using the following command:
 
 ```bash
-git clone [https://github.com/YOUR_USERNAME/dgm-course-projects.git](https://github.com/YOUR_USERNAME/dgm-course-projects.git)
+git clone [https://github.com/YOUR_USERNAME/dgm-course-projects.git](https://github.com/Armin-ghasemi/dgm-course-projects.git)
 cd dgm-course-projects
