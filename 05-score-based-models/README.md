@@ -1,68 +1,139 @@
-# Score-Based Generative Modeling with NCSN
+# Noise-Conditional Score Network on MNIST
 
 ![Course](https://img.shields.io/badge/Course-Deep%20Generative%20Models-blue)
 ![University](https://img.shields.io/badge/University-University%20of%20Tehran-red)
 ![Assignment](https://img.shields.io/badge/Assignment-HW3%20--%20Question%202-green)
 
-This project implements **Noise-Conditional Score Networks (NCSN)** for score-based generative modeling on the MNIST dataset. The assignment consists of two parts: first, training an NCSN to estimate the score of noise-perturbed image distributions, and then extending the model with class conditioning for controlled generation of specific MNIST digits.
+This project implements a **Noise-Conditional Score Network (NCSN)** for generative modeling on the MNIST dataset. The model learns the score function of noise-perturbed data distributions at multiple noise levels and uses **Annealed Langevin Dynamics** to generate samples.
+
+A conditional version is also implemented, allowing the model to generate samples corresponding to specific MNIST digit classes.
 
 ## Project Goals
 
-1. **Score Estimation:** Implement a Noise-Conditional Score Network to estimate the score function at different noise levels.
-2. **Noise Conditioning:** Incorporate noise-level information using Gaussian Fourier embeddings and FiLM-based conditioning.
-3. **Score-Based Generation:** Generate MNIST samples using annealed Langevin dynamics.
-4. **Conditional Generation:** Extend the NCSN with digit-class conditioning to generate samples from specified MNIST classes.
-5. **Generation Analysis:** Analyze the training process, denoising behavior, and generated samples.
+1. **Score Matching:** Train a neural network to estimate the score of noisy MNIST distributions.
+2. **Noise Conditioning:** Condition the network on multiple noise levels to model distributions with different levels of corruption.
+3. **NCSN Sampling:** Generate samples using Annealed Langevin Dynamics.
+4. **Conditional Generation:** Extend the model with class conditioning to generate specific digit classes.
+5. **Sample Evaluation:** Visualize the denoising process and final generated samples.
 
 ## Task 1: Noise-Conditional Score Network
 
-The first part implements a **Noise-Conditional Score Network (NCSN)** for score-based generative modeling on MNIST.
+The first part implements a Noise-Conditional Score Network for MNIST.
 
-Instead of directly modeling the data distribution, the network estimates the score of a noise-perturbed distribution:
+Instead of directly modeling the probability density, the network learns its score function:
 
-$$
-s_\theta(x,\sigma) \approx \nabla_x \log p_\sigma(x)
-$$
+`score(x) = ∇x log p(x)`
 
-### Noise Levels
+The score indicates the direction in which the input should move to reach regions of higher probability.
 
-The model uses **50 noise levels**, ranging from $\sigma_{\max}=30$ to $\sigma_{\min}=0.01$ using a geometric progression.
+### Noise Perturbation
 
-For each training sample, Gaussian noise is added according to a selected noise level:
+A set of **50 noise levels** is used, ranging geometrically from:
 
-$$
-\tilde{x}=x+\sigma z,
-\qquad
-z\sim\mathcal{N}(0,I)
-$$
+`σ_max = 30`
 
-### Noise Conditioning
+to:
 
-The noise level is encoded using a **Gaussian Fourier embedding** and incorporated into the network through **FiLM-based conditioning**.
+`σ_min = 0.01`
+
+For an original image `x`, Gaussian noise is added according to:
+
+`x̃ = x + σz`
+
+where `z` is sampled from a standard Gaussian distribution.
+
+The network receives both the noisy image and its corresponding noise level and learns to estimate the score of the perturbed distribution.
+
+### Noise-Level Embedding
+
+The noise level is represented using a **Gaussian Fourier feature embedding**.
+
+This embedding provides the network with a continuous representation of the noise level and allows the same model to operate across the full range of noise scales.
+
+The embedded noise information is incorporated into the network through **FiLM conditioning**.
 
 ### Score Matching Objective
 
-For the Gaussian perturbation process, the target score is:
+For the perturbed image `x̃ = x + σz`, the target score is:
 
-$$
-\nabla_{\tilde{x}}\log q_\sigma(\tilde{x}|x)
-=
--\frac{z}{\sigma}
-$$
+`target = -z / σ`
 
-The network is trained using the corresponding weighted denoising score-matching objective.
+The network is trained to predict this target score:
 
-### Network Architecture
+`scoreθ(x̃, σ) ≈ -z / σ`
 
-The NCSN uses a **U-Net-like architecture** with residual blocks, downsampling and upsampling paths, skip connections, and noise-level conditioning. The network outputs a score map with the same spatial dimensions as the input image.
+This allows the model to learn the score field for each noise level without explicitly estimating the data density.
 
-### Training and Sampling
+### NCSN Architecture
 
-The model is trained on MNIST and samples are generated using **annealed Langevin dynamics**, progressively transforming noisy samples into structured image samples across the sequence of noise levels.
+The score network follows a U-Net-like architecture with:
+
+* Convolutional layers for feature extraction
+* Residual blocks
+* Downsampling and upsampling layers
+* Skip connections
+* Gaussian Fourier noise-level embeddings
+* FiLM-based conditioning
+
+The overall structure can be summarized as:
+
+```text
+Noisy image + Noise level
+          ↓
+   Noise embedding
+          ↓
+   U-Net-like network
+          ↓
+    Predicted score
+```
+
+### Training
+
+The model is trained using noisy versions of MNIST images at randomly selected noise levels.
+
+The training process minimizes the difference between the predicted score and the analytical score-matching target.
+
+The training loss is monitored throughout the training process.
 
 ![NCSN Training Loss](https://raw.githubusercontent.com/Armin-ghasemi/dgm-course-projects/main/05-score-based-models/assets/showcase/ncsn_training_loss.png)
 
-The denoising process is visualized below:
+## Annealed Langevin Dynamics
+
+After training, samples are generated using **Annealed Langevin Dynamics**.
+
+Instead of using a single noise level, sampling starts from a high-noise distribution and gradually moves toward lower noise levels.
+
+At each noise level, the sample is updated using the learned score function.
+
+A simplified update can be written as:
+
+`x(t+1) = x(t) + α scoreθ(x(t), σ) + √(2α) z(t)`
+
+where `α` is the Langevin step size and `z(t)` is Gaussian noise.
+
+The sampling procedure follows the noise schedule from the largest noise level to the smallest:
+
+```text
+High noise
+   ↓
+σ₁
+   ↓
+σ₂
+   ↓
+...
+   ↓
+σ₅₀
+   ↓
+Low noise
+   ↓
+Generated sample
+```
+
+This gradual transition allows the model to first capture the broad structure of the data and then refine the generated samples at lower noise levels.
+
+### Denoising Process
+
+The intermediate states of the sampling process are visualized to show how noisy inputs gradually develop into recognizable MNIST digits.
 
 ![NCSN Denoising Process](https://raw.githubusercontent.com/Armin-ghasemi/dgm-course-projects/main/05-score-based-models/assets/showcase/ncsn_denoising.png)
 
@@ -70,50 +141,44 @@ The denoising process is visualized below:
 
 The second part extends the NCSN to support **class-conditional generation**.
 
-The conditional model estimates:
+MNIST contains 10 digit classes, from `0` to `9`. A learnable class embedding is introduced so that the score network receives both the noise-level information and the desired digit class.
 
-$$
-s_\theta(x,\sigma,y)
-$$
+The conditional score function can be represented as:
 
-where $y$ represents the desired MNIST digit class.
+`scoreθ(x, σ, y)`
 
-### Class Conditioning
+where:
 
-A learnable embedding is used for the **10 MNIST digit classes**. The class embedding is combined with the noise-level embedding and incorporated into the residual blocks through the conditioning mechanism.
+* `x` is the noisy image
+* `σ` is the noise level
+* `y` is the target digit class
 
-```text
-Noisy image
-    +
-Noise level
-    +
-Target digit class
-    ↓
-Conditional NCSN
-    ↓
-Conditioned score map
-```
+The class embedding is incorporated into the network together with the noise-level embedding.
 
 ### Conditional Sampling
 
-During sampling, a target digit class is selected and kept fixed while **annealed Langevin dynamics** progressively refines the generated sample.
+During sampling, a target class is specified for each generated sample.
 
-Multiple samples are generated for each digit class. The final visualization contains generated samples for all ten MNIST classes.
+The model then performs Annealed Langevin Dynamics while conditioning the score predictions on the selected class.
+
+The final experiment generates **16 samples for each of the 10 MNIST classes**, producing an ordered grid of 160 generated images.
+
+![Conditional Samples](https://raw.githubusercontent.com/Armin-ghasemi/dgm-course-projects/main/05-score-based-models/assets/showcase/conditional_samples.png)
 
 ## Models & Analysis
 
-| Model                | Conditioning              | Sampling Method                        | Key Analysis                                                                                                    |
-| :------------------- | :------------------------ | :------------------------------------- | :-------------------------------------------------------------------------------------------------------------- |
-| **NCSN**             | Noise level               | Annealed Langevin Dynamics             | Estimates the score of noise-perturbed MNIST distributions and generates samples through progressive denoising. |
-| **Conditional NCSN** | Noise level + digit class | Conditional Annealed Langevin Dynamics | Generates samples guided by a specified MNIST digit class.                                                      |
+| Model                | Conditioning              | Sampling Method            | Key Analysis                                                            |
+| :------------------- | :------------------------ | :------------------------- | :---------------------------------------------------------------------- |
+| **NCSN**             | Noise level               | Annealed Langevin Dynamics | Learns the score field of multiple noise-perturbed MNIST distributions. |
+| **Conditional NCSN** | Noise level + digit class | Annealed Langevin Dynamics | Generates MNIST samples conditioned on a specified digit class.         |
 
-The final conditional generation produces **16 samples for each of the 10 MNIST classes**, with each row corresponding to one digit class.
+The two models demonstrate how score-based generative modeling can be extended from unconditional generation to class-conditional generation.
 
 ## Sample Results
 
-The final conditional samples demonstrate class-controlled generation across all ten MNIST digit classes.
+The experiments visualize both the intermediate denoising process and the final generated samples.
 
-![Conditional NCSN Samples](https://raw.githubusercontent.com/Armin-ghasemi/dgm-course-projects/main/05-score-based-models/assets/showcase/conditional_samples.png)
+The unconditional NCSN demonstrates progressive refinement from highly noisy states toward recognizable MNIST-like images. The Conditional NCSN further allows the generated samples to be controlled by specifying the desired digit class.
 
 ## File Structure
 
@@ -128,17 +193,17 @@ The final conditional samples demonstrate class-controlled generation across all
         └── conditional_samples.png
 ```
 
-* `NCSN_MNIST.ipynb`: The main notebook containing the NCSN and Conditional NCSN implementations, training procedures, sampling methods, and analysis.
-* `assets/showcase/`: Selected figures from the notebook used in this README.
+* `NCSN_MNIST.ipynb`: The main notebook containing the NCSN and Conditional NCSN implementations, training procedure, and sampling experiments.
+* `assets/showcase/`: Selected visualizations from the notebook used in this README.
 
 ## How to Run
 
 1. Install the required packages:
 
 ```bash
-pip install torch torchvision numpy matplotlib tqdm
+pip install torch torchvision numpy matplotlib
 ```
 
 2. Open `NCSN_MNIST.ipynb` in Jupyter Notebook or Google Colab.
-3. Run the notebook cells to download the MNIST dataset, train the models, and generate the visualizations.
+3. Run the notebook cells to download the MNIST dataset, train the NCSN models, and perform Annealed Langevin Dynamics sampling.
 4. GPU acceleration is recommended for training and sampling.
