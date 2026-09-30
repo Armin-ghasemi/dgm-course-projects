@@ -82,11 +82,11 @@ The files in `assets/input/` should therefore be copied or linked to the locatio
 
 | Image       | Preview                                                                                                                                  |
 | ----------- | ---------------------------------------------------------------------------------------------------------------------------------------- |
-| Instance 01 | ![Instance 01](https://raw.githubusercontent.com/Armin-ghasemi/dgm-course-projects/main/07-dreambooth-lora/assets/input/instance_01.png) |
-| Instance 02 | ![Instance 02](https://raw.githubusercontent.com/Armin-ghasemi/dgm-course-projects/main/07-dreambooth-lora/assets/input/instance_02.png) |
-| Instance 03 | ![Instance 03](https://raw.githubusercontent.com/Armin-ghasemi/dgm-course-projects/main/07-dreambooth-lora/assets/input/instance_03.png) |
-| Instance 04 | ![Instance 04](https://raw.githubusercontent.com/Armin-ghasemi/dgm-course-projects/main/07-dreambooth-lora/assets/input/instance_04.png) |
-| Instance 05 | ![Instance 05](https://raw.githubusercontent.com/Armin-ghasemi/dgm-course-projects/main/07-dreambooth-lora/assets/input/instance_05.png) |
+| Instance 01 | ![Instance 01](https://raw.githubusercontent.com/Armin-ghasemi/dgm-course-projects/main/07-stable-diffusion-dreambooth-lora/assets/input/instance_01.png) |
+| Instance 02 | ![Instance 02](https://raw.githubusercontent.com/Armin-ghasemi/dgm-course-projects/main/07-stable-diffusion-dreambooth-lora/assets/input/instance_02.png) |
+| Instance 03 | ![Instance 03](https://raw.githubusercontent.com/Armin-ghasemi/dgm-course-projects/main/07-stable-diffusion-dreambooth-lora/assets/input/instance_03.png) |
+| Instance 04 | ![Instance 04](https://raw.githubusercontent.com/Armin-ghasemi/dgm-course-projects/main/07-stable-diffusion-dreambooth-lora/assets/input/instance_04.png) |
+| Instance 05 | ![Instance 05](https://raw.githubusercontent.com/Armin-ghasemi/dgm-course-projects/main/07-stable-diffusion-dreambooth-lora/assets/input/instance_05.png) |
 
 ## Prior Preservation
 
@@ -214,31 +214,31 @@ Each output image is a `3 × 3` grid where:
 
 `a photo of a sks toy`
 
-![Base Subject](https://raw.githubusercontent.com/Armin-ghasemi/dgm-course-projects/main/07-dreambooth-lora/assets/showcase/prompt_base.png)
+![Base Subject](https://raw.githubusercontent.com/Armin-ghasemi/dgm-course-projects/main/07-stable-diffusion-dreambooth-lora/assets/showcase/prompt_base.png)
 
 ### Prompt 2 - Class Prompt
 
 `a photo of a toy`
 
-![Class Prompt](https://raw.githubusercontent.com/Armin-ghasemi/dgm-course-projects/main/07-dreambooth-lora/assets/showcase/prompt_class.png)
+![Class Prompt](https://raw.githubusercontent.com/Armin-ghasemi/dgm-course-projects/main/07-stable-diffusion-dreambooth-lora/assets/showcase/prompt_class.png)
 
 ### Prompt 3 - Reading a Book
 
 `a photo of a sks toy reading a book`
 
-![Reading a Book](https://raw.githubusercontent.com/Armin-ghasemi/dgm-course-projects/main/07-dreambooth-lora/assets/showcase/prompt_reading_book.png)
+![Reading a Book](https://raw.githubusercontent.com/Armin-ghasemi/dgm-course-projects/main/07-stable-diffusion-dreambooth-lora/assets/showcase/prompt_reading_book.png)
 
 ### Prompt 4 - In a Bucket
 
 `a photo of a sks toy in a bucket`
 
-![Toy in a Bucket](https://raw.githubusercontent.com/Armin-ghasemi/dgm-course-projects/main/07-dreambooth-lora/assets/showcase/prompt_bucket.png)
+![Toy in a Bucket](https://raw.githubusercontent.com/Armin-ghasemi/dgm-course-projects/main/07-stable-diffusion-dreambooth-lora/assets/showcase/prompt_bucket.png)
 
 ### Prompt 5 - Artistic Style
 
 `oil painting of a sks toy in starry night style`
 
-![Starry Night Style](https://raw.githubusercontent.com/Armin-ghasemi/dgm-course-projects/main/07-dreambooth-lora/assets/showcase/prompt_starry_night.png)
+![Starry Night Style](https://raw.githubusercontent.com/Armin-ghasemi/dgm-course-projects/main/07-stable-diffusion-dreambooth-lora/assets/showcase/prompt_starry_night.png)
 
 ## Models & Analysis
 
