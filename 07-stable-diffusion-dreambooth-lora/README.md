@@ -2,7 +2,7 @@
 
 ![Course](https://img.shields.io/badge/Course-Deep%20Generative%20Models-blue)
 ![University](https://img.shields.io/badge/University-University%20of%20Tehran-red)
-![Assignment](https://img.shields.io/badge/Assignment-HW4%20--%20Question%201%20%28Part%202%29-green)
+![Assignment](https://img.shields.io/badge/Assignment-HW4%20--%20Question%201%20%28subdivision%202%29-green)
 
 This project focuses on fine-tuning a pretrained Stable Diffusion v1.5 model for subject-specific image generation using DreamBooth and Low-Rank Adaptation (LoRA).
 
